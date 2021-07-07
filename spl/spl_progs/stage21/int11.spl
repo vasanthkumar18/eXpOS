@@ -1,0 +1,92 @@
+//----------WAIT | SIGNAL | GETPID | GETPPID---------------//
+//number of kernel mode switch
+[70*512 + 511] = [70*512+511] + 1;
+
+alias userSP 	R0;
+alias sysCalNum R1;
+alias reqPID 	R2;
+alias ret		R3;
+alias i 		R4;
+
+userSP = SP;
+
+sysCalNum = [ ([PTBR + 2*(userSP-5)/512]*512) + (userSP-5)%512];
+
+[PROCESS_TABLE + 16*[SYSTEM_STATUS_TABLE+1] + 13] = SP;
+SP = [PROCESS_TABLE + 16*[SYSTEM_STATUS_TABLE+1]+11]*512-1;
+
+//-----------------------GETPID--------------------------
+if(sysCalNum == 11)	then
+	[PROCESS_TABLE+16*[SYSTEM_STATUS_TABLE+1] + 9] = sysCalNum;
+
+	[([PTBR + 2*(userSP-1)/512]*512) + (userSP-1)%512] = [PROCESS_TABLE+16*[SYSTEM_STATUS_TABLE+1] + 1];
+
+	SP = [PROCESS_TABLE+16*[SYSTEM_STATUS_TABLE+1] + 13];
+
+	ireturn;
+endif;
+
+
+//-----------------------GETPPID--------------------------
+if(sysCalNum == 12)	then
+	[PROCESS_TABLE+16*[SYSTEM_STATUS_TABLE+1] + 9] = sysCalNum;
+
+	[([PTBR + 2*(userSP-1)/512]*512) + (userSP-1)%512] = [PROCESS_TABLE+16*[SYSTEM_STATUS_TABLE+1] + 2];
+
+	SP = [PROCESS_TABLE+16*[SYSTEM_STATUS_TABLE+1] + 13];
+
+	ireturn;
+endif;
+
+//-----------------------WAIT--------------------------
+if(sysCalNum == 13)	then
+	[PROCESS_TABLE+16*[SYSTEM_STATUS_TABLE+1] + 9] = sysCalNum;
+
+	reqPID = [ ([PTBR + 2*(userSP-4)/512]*512) + (userSP-4)%512];
+
+	if(reqPID<0 || reqPID>15 || reqPID==[SYSTEM_STATUS_TABLE+1] || [PROCESS_TABLE + 16*reqPID + 4] == TERMINATED)	then
+
+		[([PTBR + 2*(userSP-1)/512]*512) + (userSP-1)%512] = -1;
+
+		[PROCESS_TABLE+16*[SYSTEM_STATUS_TABLE+1]+9] = 0;
+		SP = userSP;
+
+		ireturn;
+	endif;
+
+	[PROCESS_TABLE + 16*[SYSTEM_STATUS_TABLE+1] +4] = WAIT_PROCESS;
+	[PROCESS_TABLE + 16*[SYSTEM_STATUS_TABLE+1] +5] = reqPID;
+
+	backup;
+	call MOD_5;
+	restore;
+
+	[PROCESS_TABLE+16*[SYSTEM_STATUS_TABLE+1]+9] = 0;
+	[([PTBR + 2*(userSP-1)/512]*512) + (userSP-1)%512] = 0;
+
+	SP = [PROCESS_TABLE+16*[SYSTEM_STATUS_TABLE+1] + 13];
+
+	ireturn;
+endif;
+
+
+//-----------------------SIGNAL--------------------------
+if(sysCalNum == 14)	then
+	[PROCESS_TABLE+16*[SYSTEM_STATUS_TABLE+1] + 9] = sysCalNum;
+
+	i=0;
+	while(i < 16)	do
+		if(([PROCESS_TABLE + 16*i + 4] == WAIT_PROCESS) &&
+		([PROCESS_TABLE + 16*i + 5] == [SYSTEM_STATUS_TABLE+1]))	then
+			[PROCESS_TABLE+16*i+4] = READY;
+		endif;
+		i = i+1;
+	endwhile;
+
+	[PROCESS_TABLE+16*[SYSTEM_STATUS_TABLE+1]+9] = 0;
+	[([PTBR + 2*(userSP-1)/512]*512) + (userSP-1)%512] = 0;
+
+	SP = [PROCESS_TABLE+16*[SYSTEM_STATUS_TABLE+1] + 13];
+
+	ireturn;
+endif;

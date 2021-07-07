@@ -1,0 +1,184 @@
+//---------------------FORK SYS CALL---------//
+//number of kernel mode switch
+[70*512 + 511] = [70*512+511] + 1;
+
+[PROCESS_TABLE + 16*[SYSTEM_STATUS_TABLE + 1] + 9] = 8;
+
+alias userSP R10;
+userSP = SP;
+
+[PROCESS_TABLE + 16*[SYSTEM_STATUS_TABLE + 1] + 13] = SP;
+SP = [PROCESS_TABLE + 16*[SYSTEM_STATUS_TABLE+1] + 11]*512 -1;
+
+alias childPID R11;
+
+R1 = GET_PCB_ENTRY;
+R2 = [SYSTEM_STATUS_TABLE+1];
+
+call MOD_1;		//PROCESS MANAGER MODULE
+
+childPID = R0;
+
+
+if(childPID == -1)	then
+	[ ([PTBR + 2*((userSP-1)/512)])*512 + (userSP-1)%512 ] = -1;	//ret value
+
+	SP = userSP;
+	[PROCESS_TABLE + 16*[SYSTEM_STATUS_TABLE + 1] + 9] = 0;		//mode flag
+
+	ireturn;
+endif;
+
+//////////////////////////////////////////////////////////////////
+///////////SETTING UP PAGE TABLE ENTRIES FOR CHILD////////////////
+//////////////////////////////////////////////////////////////////
+
+alias childPTBR R12;
+childPTBR = PAGE_TABLE_BASE + childPID*20;
+
+//----------------STACK PAGE 1-----------
+
+backup;
+R1 = GET_FREE_PAGE;
+call MOD_2;		//MEMORY MANAGER MODULE
+[childPTBR + 16] = R0;
+[childPTBR + 17] = [PTBR + 17];
+restore;
+
+
+//-------------------STACK PAGE 2
+
+backup;
+R1 = GET_FREE_PAGE;
+call MOD_2;		//MEMORY MANAGER MODULE
+[childPTBR + 18] = R0;
+[childPTBR + 19] = [PTBR + 19];
+restore;
+
+//USER AREA PAGE
+
+backup;
+R1 = GET_FREE_PAGE;
+call MOD_2;		//MEMORY MANAGER MODULE
+[PROCESS_TABLE + 16*childPID + 11] = R0;
+restore;
+
+//////////////////////////////////////////////////////////////////////////////SETTING UP PROCESS TABLE ENTRIES FOR CHILD//////////////
+///////////////////////////////////////////////////////////////////
+
+alias childProEntry R13;
+childProEntry = PROCESS_TABLE + 16*childPID;
+
+//TICK FIELD
+[childProEntry + 0] = 0;
+
+//PPID
+[childProEntry + 2] = [PROCESS_TABLE+16*[SYSTEM_STATUS_TABLE+1] + 1];
+
+//userID
+[childProEntry + 3] = [PROCESS_TABLE+16*[SYSTEM_STATUS_TABLE+1] + 3];
+
+//STATE
+[childProEntry + 4] = CREATED;
+
+//SWAP FLAG
+[childProEntry + 6] = [PROCESS_TABLE+16*[SYSTEM_STATUS_TABLE+1] + 6];
+
+//INODE INDEX
+[childProEntry + 7] = [PROCESS_TABLE+16*[SYSTEM_STATUS_TABLE+1] + 7];
+
+//MODE FLAG
+[childProEntry + 9] = 0;
+
+//USER ARE SWAP STATUS
+[childProEntry + 10] = [PROCESS_TABLE+16*[SYSTEM_STATUS_TABLE+1] + 10];
+
+//KPTR
+[childProEntry + 12] = 0;
+
+//UPTR
+[childProEntry + 13] = [PROCESS_TABLE+16*[SYSTEM_STATUS_TABLE+1] + 13];
+
+//////////////////////////////////////////////////////////////////
+
+//COPY PARENT PERPROCESS RESOURCE TABLE TO CHILD
+
+alias i R14;
+i = 496;
+
+alias parUAPage R4;
+alias childUAPage R5;
+alias idx R6;
+
+parUAPage = [PROCESS_TABLE + 16*[SYSTEM_STATUS_TABLE + 1] + 11];
+childUAPage = [PROCESS_TABLE + 16*childPID + 11];
+
+
+while(i < 512)	do
+	[childUAPage * 512 + i] = [parUAPage *512 + i];
+	[childUAPage * 512 + i + 1] = [parUAPage *512 + i + 1];
+
+	idx = [parUAPage *512 + i + 1];
+
+	//inc process count
+	if( [parUAPage*512 + i] == SEMAPHORE)	then
+		[SEMAPHORE_TABLE + 4*idx + 1] = [SEMAPHORE_TABLE + 4*idx + 1] + 1;
+
+	endif;
+
+	//inc open instance count
+	if( [parUAPage*512 + i] == FILE)	then
+		[OPEN_FILE_TABLE + 4*idx + i] = [OPEN_FILE_TABLE + 4*idx + i] + 1;
+
+	endif;
+
+	i = i + 2;
+endwhile;
+
+
+//COPY PARENT PERPROCESS DISK MAP TABLE TO CHILD
+i = 0;
+while(i < 10)	do
+	[DISK_MAP_TABLE + 10*childPID + i] = [DISK_MAP_TABLE + 10*[SYSTEM_STATUS_TABLE+1] + i];
+
+	i = i+1;
+endwhile;
+
+
+//SETTING PAGE TABLE ENTRIES FOR CHILD (SHARED)
+
+i = 0;
+while(i < 16)	do
+	[childPTBR + i] = [PTBR + i];
+	[childPTBR + i + 1] = [PTBR + i + 1];
+
+	if([childPTBR + i] != -1) then
+		[MEMORY_FREE_LIST + [childPTBR + i]] = [MEMORY_FREE_LIST + [childPTBR + i]] + 1; 		//share count
+	endif;
+
+	i = i + 2;
+endwhile;
+
+//////////////////////////////////////////////////////////////////
+
+//CLONING USER STACK
+
+i = 0;
+while(i < 512)	do
+	[[childPTBR + 16]*512 + i] = [[PTBR + 16]*512 + i];
+	[[childPTBR + 18]*512 + i] = [[PTBR + 18]*512 + i];
+	i = i+1;
+endwhile;
+
+//Storing BP on top of Kernal Stack
+[[PROCESS_TABLE + 16*childPID + 11]*512] = BP;
+
+[([PTBR + 2*((userSP-1)/512)]*512) + ((userSP-1)%512)] = childPID;
+
+[([childPTBR + 2*((userSP-1)/512)]*512) + ((userSP-1)%512)] = 0;
+
+[PROCESS_TABLE + 16*[SYSTEM_STATUS_TABLE+1]+9] = 0;
+
+SP = userSP;
+
+ireturn;

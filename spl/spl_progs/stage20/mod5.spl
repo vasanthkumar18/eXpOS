@@ -1,0 +1,80 @@
+alias currPID R0;
+alias curr_process_table R1;
+
+currPID = [SYSTEM_STATUS_TABLE + 1];           // PID OF CURRENT PROCESS
+multipush(BP);				       // PUSH THE BP REGISTER ON TOP OF KERNEL STACK
+
+curr_process_table = PROCESS_TABLE + currPID*16;   //PROCESS TABLE ENTRY FOR CURRENT PID
+[curr_process_table + 12] = SP%512;		   //SAVE OFFSET IN KPTR FIELD
+[curr_process_table + 14] = PTBR;
+[curr_process_table + 15] = PTLR;
+
+
+alias counter R2;
+alias newPID R3;
+alias new_process_table R4;
+alias loop_counter R5;
+
+//ITERATE THROUGH SUCCEEDING ENTRIES OF CURRENT PROCESS TO FIND A PROCESS IN READY STATE/CREATED STATE.
+// READY STATE : READY FOR EXECUTION
+//CREATED STATE : NOT SCHEDULED ONCE BEFORE
+counter = currPID + 1;
+newPID = 0;
+
+loop_counter = 0;
+
+//breakpoint;
+while(loop_counter < 17) do
+
+	new_process_table = PROCESS_TABLE + counter*16;
+	if([new_process_table + 4] == CREATED || [new_process_table + 4] == READY) then
+		newPID = counter;
+		break;
+	endif;
+	counter = counter + 1;
+	if(counter == 16) then
+		counter = 1;
+	endif;
+	loop_counter = loop_counter + 1;
+endwhile;
+
+//print newPID;
+
+//IF NO PROCESS FOUND, SELECT THE IDLE PROCESS
+//if(newPID == 0 && [curr_process_table + 4] == READY) then
+//	newPID = currPID;
+//endif;
+
+
+// IF ANY SUCH PROCESS IS FOUND:
+new_process_table = PROCESS_TABLE + newPID*16;
+
+
+//GET THE UAPN AND KPTR, SET SP.
+SP = [new_process_table + 11]*512 + [new_process_table + 12];
+
+//SET PTBR, PTLR.
+PTBR = [new_process_table + 14];
+PTLR = [new_process_table + 15];
+
+// SET PID FOR NEW PROCESS
+[SYSTEM_STATUS_TABLE + 1] = newPID;
+
+
+if([new_process_table + 4] == CREATED) then
+	SP = [new_process_table + 13];
+	BP = [[new_process_table + 11]*512];
+	[new_process_table + 4] = RUNNING;
+	[new_process_table + 9] = 0;
+	ireturn;
+endif;
+
+//SET THE PROCESS AS RUNNING
+[new_process_table + 4] = RUNNING;
+
+// RESTORE THE BASE POINTER
+multipop (BP);
+
+//breakpoint;
+return;
+

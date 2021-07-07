@@ -1,0 +1,27 @@
+// Implementing TERMINAL WRITE FUNCTION of MOD 4
+alias functionNum R1;
+alias currentPID R2;
+alias word R3;
+if(functionNum==3) then
+	backup;
+
+	R1=8;
+	R2=currentPID;
+	call MOD_0;
+	restore;
+	
+	print word;
+	
+	backup;
+
+	R1=9; // calling RELEASE TERMINAL FUNCTION
+	R2=currentPID;
+	call MOD_0;
+	
+	restore;
+	return;
+else
+	return;
+
+endif;
+	

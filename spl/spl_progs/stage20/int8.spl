@@ -1,0 +1,211 @@
+breakpoint;
+[PROCESS_TABLE+[SYSTEM_STATUS_TABLE+1]*16+9] = 8;
+[PROCESS_TABLE+[SYSTEM_STATUS_TABLE+1]*16+13] = SP;
+
+SP = [PROCESS_TABLE+[SYSTEM_STATUS_TABLE+1]*16+11]*512-1;
+
+//To get a new PID for the child process, invoke the Get Pcb Entry function from the process manager module.
+
+R1 = GET_PCB_ENTRY;
+call MOD_1;
+
+alias childpid R15;
+R15 = R0;
+
+if(R0 == -1) then
+	multipush(R1);
+	alias userSP R1;
+	userSP = [PROCESS_TABLE+[SYSTEM_STATUS_TABLE+1]*16+13];
+	[[PTBR + 2*((userSP-1)/512)]*512 + (userSP-1)%512] = -1;
+	[PROCESS_TABLE+[SYSTEM_STATUS_TABLE+1]*16+9] = 0;
+	SP = userSP;
+	multipop(R1);
+	ireturn;
+endif;
+
+// IF HEAP IS NOT ALLOCATED
+
+if([PTBR+4] == -1) then
+	backup;
+	
+	R1 = GET_FREE_PAGE;
+	call MOD_2;
+	[PTBR+4] = R0;
+	[PTBR+5] = "0110";
+	
+	R1 = GET_FREE_PAGE;
+	call MOD_2;
+	[PTBR+6] = R0;
+	[PTBR+7] = "0110";
+	
+	restore;
+
+endif;
+
+//backup;
+alias child_process_table R8;
+alias parent_process_table R9;
+alias par_UAPN R10;
+alias child_page_table R11;
+alias child_UAPN R12;
+
+parent_process_table = PROCESS_TABLE+[SYSTEM_STATUS_TABLE+1]*16;
+child_process_table = PROCESS_TABLE+childpid*16;
+par_UAPN = [PROCESS_TABLE+[SYSTEM_STATUS_TABLE]*16+11];
+child_page_table = PAGE_TABLE_BASE + childpid*20;
+
+// USED : R1, R2, R3, R4, R5, R6, R7
+//-------------------------------- ALLOCATE PAGES OF STACK FOR CHILD-------------------------------------
+
+	backup;
+	
+	R1 = GET_FREE_PAGE;
+	call MOD_2;
+	[child_page_table+16] = R0;
+	[child_page_table+17] = "0110";
+
+	R1 = GET_FREE_PAGE;
+	call MOD_2;
+	[child_page_table+18] = R0;
+	[child_page_table+19] = "0110";
+
+	restore;
+
+//--------------------------------PAGES FOR STACK ALLOCATED---------------------------------------------
+
+
+//--------------------------------ALLOCATE USER AREA PAGE(CHILD)---------------------------------------
+
+//	backup;
+
+	R1 = GET_FREE_PAGE;
+	call MOD_2;
+	[PROCESS_TABLE+childpid*16+11] = R0;
+	child_UAPN = R0;
+
+//	restore;
+
+//------------------------------------------------------------------------------------------------------
+
+// THINGS TO BE COPIED FROM PARENT PROCESS TABLE : 
+// USERID
+//SWAP FLAG
+//USER AREA SWAP STATUS
+//INODE INDEX
+//UPTR
+
+//	backup;
+
+	alias i R3;
+	i = 0;
+	while(i < 16) do
+		if(i == 3 || i == 6 || i == 7 || i == 10 || i == 13) then
+			[PROCESS_TABLE+childpid*16+i] = [PROCESS_TABLE+[SYSTEM_STATUS_TABLE+1]*16+i];
+		endif;
+	i = i+1;
+	endwhile;
+
+//	restore;
+
+// SET THE MODE FLAG, KPTR, TICK FIELD TO 0
+
+[PROCESS_TABLE+childpid*16+9] = 0;
+[PROCESS_TABLE+childpid*16+12] = 0;
+[PROCESS_TABLE+childpid*16+0] = 0;
+
+[PROCESS_TABLE+childpid*16+1] = childpid;
+[PROCESS_TABLE+childpid*16+2] = [SYSTEM_STATUS_TABLE+1];
+[PROCESS_TABLE+childpid*16+4] = CREATED;
+
+//----------------------------COPYING THE PER PROCESS RESOURCE TABLE OF PARENT----------------------	
+	backup;
+
+	alias j R1;
+	j = 496;
+	while(j < 512) do
+		[child_UAPN*512+j] = [par_UAPN*512+j];
+		j = j+1;
+	endwhile;
+
+	restore;
+
+//----------------------------COPYING THE DISK MAP TABLE OF PARENT----------------------------------
+
+alias parent_disk_map_table R13;
+alias child_disk_map_table R14;
+
+	parent_disk_map_table = DISK_MAP_TABLE+[SYSTEM_STATUS_TABLE+1]*10;
+	child_disk_map_table = DISK_MAP_TABLE+childpid*10;
+
+//	backup;
+
+	i = 2;
+	while(i <= 7) do
+		[child_disk_map_table+i] = [parent_disk_map_table+i];
+		i = i+1;
+	endwhile;
+
+	[child_disk_map_table+8] = -1;
+	[child_disk_map_table+9] = -1;
+
+//	restore;
+
+//------------------------------INITIALIZE PAGE TABLE FOR CHILD--------------------------------------
+
+// STACK ALREADY INITIALIZED
+
+i = 0;
+while(i < 16) do
+	[child_page_table+i] = [PAGE_TABLE_BASE+ [SYSTEM_STATUS_TABLE+1]*20 + i];
+	if(i%2 == 0) then
+		if([PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE+1]*20 + i] != -1) then
+		[MEMORY_FREE_LIST + [PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE+1]*20 + i]] = [MEMORY_FREE_LIST + [PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE+1]*20 + i]] + 1;
+		endif;
+	endif;
+	i = i+1;
+endwhile;
+
+//------------------------COPY CONTENTS OF PARENT USER STACK INTO CHILD USER STACK----------------------
+
+//	backup;
+        alias page R6;
+	alias child_page R7;
+        page = [PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE+1]*20+16];
+	child_page = [PAGE_TABLE_BASE + childpid*20+16];
+	
+	i = 0;
+while( i < 512) do
+	[child_page*512+i] = [page*512+i];
+	i = i+1;
+endwhile;
+
+	page = [PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE+1]*20 + 18];
+	child_page = [PAGE_TABLE_BASE + childpid*20 + 18];
+
+	i = 0;
+while(i < 512) do
+	[child_page*512 + i] = [page*512 + i];
+	i = i+1;
+endwhile;
+
+//	restore;
+
+breakpoint;
+[[PROCESS_TABLE + childpid*16 + 11]*512] = BP;
+
+//backup;
+alias ret_parent R13;
+alias ret_child R14;
+
+ret_parent = [PROCESS_TABLE+[SYSTEM_STATUS_TABLE+1]*16+13];
+ret_child = [PROCESS_TABLE+childpid*16+13];
+
+[[PTBR+2*((ret_parent-1)/512)] * 512 + (ret_parent-1)%512] = childpid;
+[[child_page_table+2*((ret_child-1)/512)] * 512 + (ret_child-1)%512] = 0;
+
+SP = [PROCESS_TABLE+[SYSTEM_STATUS_TABLE+1]*16+13];
+
+[PROCESS_TABLE+[SYSTEM_STATUS_TABLE+1]*16+9] = 0;
+//restore;
+
+ireturn;

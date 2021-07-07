@@ -1,0 +1,122 @@
+//--------------------SEMGET | SEMRELEASE-----------------//
+//number of kernel mode switch
+[70*512 + 511] = [70*512+511] + 1;
+
+alias userSP 		R0;
+alias sysCalNum 	R1;
+alias i				R2;
+alias freeEntry		R3;
+alias UAPage		R4;
+alias retVal		R5;
+alias semDescriptor	R6;
+alias semTableIdx	R7;
+
+userSP = SP;
+
+sysCalNum = [([PTBR + 2 * ((userSP - 5) / 512)] * 512) + ((userSP - 5) % 512)];
+
+[PROCESS_TABLE + 16*[SYSTEM_STATUS_TABLE+1] + 13] = SP;
+SP = [PROCESS_TABLE + 16*[SYSTEM_STATUS_TABLE+1]+11]*512-1;
+
+//--------------------SEMGET--------------------
+if(sysCalNum == 17)	then
+	[PROCESS_TABLE+16*[SYSTEM_STATUS_TABLE+1] + 9] = sysCalNum;
+
+	UAPage = [PROCESS_TABLE+16*[SYSTEM_STATUS_TABLE+1]+11];
+	freeEntry = -1;
+	i = 496;
+
+	while( i < 512)	do
+		if( [UAPage*512 + i] == -1)	then
+			freeEntry = i;
+			break;
+		endif;
+
+		i = i+2;
+	endwhile;
+
+	if(freeEntry == -1)	then
+		[([PTBR + 2 * ((userSP - 1) / 512)] * 512) + ((userSP - 1) % 512)] = -1;
+
+		[PROCESS_TABLE + 16*[SYSTEM_STATUS_TABLE+1] + 9] = 0;
+
+		SP = userSP;
+		ireturn;
+	endif;
+
+	semDescriptor = (freeEntry - 496)/2;
+
+	[UAPage*512+freeEntry] = 1;		//resource identifier field is semaphore
+
+	backup;
+
+	R1 = ACQUIRE_SEMAPHORE;
+	R2 = [SYSTEM_STATUS_TABLE+1];
+
+	call MOD_0;		//resorce manager module
+
+	semTableIdx = R0;
+
+	restore;
+
+	if(semTableIdx == -1)	then
+		[([PTBR + 2 * ((userSP - 1) / 512)] * 512) + ((userSP - 1) % 512)] = -2;
+
+		[PROCESS_TABLE + 16*[SYSTEM_STATUS_TABLE+1] + 9] = 0;
+		SP = userSP;
+
+		ireturn;
+	endif;
+
+	[UAPage*512+freeEntry+1] = semTableIdx;
+
+	SP = [PROCESS_TABLE + 16*[SYSTEM_STATUS_TABLE+1] + 13];
+	[PROCESS_TABLE + 16*[SYSTEM_STATUS_TABLE+1] + 9] = 0;
+
+	[([PTBR + 2 * ((userSP - 1) / 512)] * 512) + ((userSP - 1) % 512)] = semDescriptor;
+
+	ireturn;
+endif;
+
+
+//-------------------SEM RELEASE-------------------
+if(sysCalNum == 18)	then
+	[PROCESS_TABLE+16*[SYSTEM_STATUS_TABLE+1] + 9] = sysCalNum;
+
+	UAPage = [PROCESS_TABLE+16*[SYSTEM_STATUS_TABLE+1]+11];
+
+	semDescriptor = [([PTBR + 2 * ((userSP - 4) / 512)] * 512) + ((userSP - 4) % 512)];
+
+	if(semDescriptor<0 || semDescriptor>7 || [UAPage*512+(semDescriptor*2+496)] != 1)	then
+
+		[([PTBR + 2 * ((userSP - 1) / 512)] * 512) + ((userSP - 1) % 512)] = -1;
+
+		[PROCESS_TABLE + 16*[SYSTEM_STATUS_TABLE+1] + 9] = 0;
+		SP = userSP;
+
+		ireturn;
+	endif;
+
+	backup;
+
+	R1 = ACQUIRE_SEMAPHORE;
+	R2 = [SYSTEM_STATUS_TABLE+1];
+	R3 = [UAPage*512+(semDescriptor*2+496)+1];
+
+	call MOD_0;
+
+	if(R0 == -1)	then
+		print "SemTabIndERR";
+	endif;
+
+	restore;
+
+	[UAPage*512+(semDescriptor*2+496)] = -1;
+
+	SP = [PROCESS_TABLE+16*[SYSTEM_STATUS_TABLE+1]+13];
+
+	[([PTBR + 2 * ((userSP - 1) / 512)] * 512) + ((userSP - 1) % 512)] = 0;
+
+	ireturn;
+
+endif;

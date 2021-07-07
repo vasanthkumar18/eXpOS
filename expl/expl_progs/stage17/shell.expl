@@ -1,0 +1,20 @@
+int main() {
+decl
+        int temp;
+        str message;
+enddecl
+
+begin
+        message = "program name";
+        temp = exposcall("Write", -2, message);
+        temp = exposcall("Read", -1, message);
+        temp = exposcall("Exec", message);
+
+        if(temp == -1) then
+                message = "doesn't exist";
+                temp = exposcall("Write", -2, message);
+        endif;
+
+        return 0;
+end
+}

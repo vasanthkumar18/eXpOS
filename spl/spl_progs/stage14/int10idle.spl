@@ -1,0 +1,14 @@
+alias currpid R0;
+alias curr_process_table R1;
+alias counter R2;
+
+currpid=[SYSTEM_STATUS_TABLE+1];
+curr_process_table=PROCESS_TABLE+currpid*16;
+[curr_process_table+9]=10; 
+[curr_process_table+13]=SP;
+[curr_process_table+4]=TERMINATED;
+SP=[curr_process_table+11]*512;
+
+call MOD_5;
+
+

@@ -1,0 +1,31 @@
+decl
+	int gcd(int num1, int num2);
+enddecl
+
+int gcd(int num1, int num2) {
+	decl
+	int temp;
+	enddecl
+	begin	
+		while(num1 !=0) do
+			temp=num1;
+			num1=num2%num1;
+			num2=temp;
+		endwhile;
+		return num2;
+	end
+}
+int main() {
+        decl
+                int temp1, hcf, temp2, num1, num2, temp3;
+        enddecl
+        begin
+ 		temp1 = exposcall("Read", -1, num1);
+		temp2 = exposcall("Read", -1, num2);
+		hcf = gcd(num1, num2);
+		temp3 = exposcall("Write", -2, hcf);
+		return 0;
+               
+        end
+}
+

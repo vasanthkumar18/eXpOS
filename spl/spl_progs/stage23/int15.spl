@@ -1,0 +1,62 @@
+[PROCESS_TABLE+[SYSTEM_STATUS_TABLE+1]*16+9] = 15;
+alias userSP R1;
+[PROCESS_TABLE+[SYSTEM_STATUS_TABLE+1]*16+13] = SP;
+userSP = [PROCESS_TABLE+[SYSTEM_STATUS_TABLE+1]*16+13];
+SP = [PROCESS_TABLE+[SYSTEM_STATUS_TABLE+1]*16+11]*512-1;
+
+if([PROCESS_TABLE+[SYSTEM_STATUS_TABLE+1]*16+1] != 1 || [PROCESS_TABLE+[SYSTEM_STATUS_TABLE+1]*16+3] != 1)then
+        [[PTBR+2*((userSP-1)/512)]*512 + (userSP-1)%512] = -1;
+        [PROCESS_TABLE+[SYSTEM_STATUS_TABLE+1]*16+9] = 0;
+        SP = [PROCESS_TABLE+[SYSTEM_STATUS_TABLE+1]*16+13];
+
+        ireturn;
+endif;
+
+alias page_num R5;
+alias block_num R6;
+
+//----------------------------------STORE THE MEM COPY IN DISK-------------------------------------------
+
+page_num = 59;
+block_num = 3;
+R1 = DISK_STORE;
+R2 = [SYSTEM_STATUS_TABLE + 1];
+R3 = page_num;
+R4 = block_num;
+call MOD_4;
+
+page_num = 60;
+block_num = 4;
+R1 = DISK_STORE;
+R2 = [SYSTEM_STATUS_TABLE + 1];
+R3 = page_num;
+R4 = block_num;
+call MOD_4;
+
+//-------------------------------------INODE TABLE STORED IN DISK----------------------------------------
+
+
+//----------------------------------STORE THE MEM COPY OF DISK FREE LIST---------------------------------
+
+page_num = 61;
+block_num = 2;
+R1 = DISK_STORE;
+R2 = [SYSTEM_STATUS_TABLE+1];
+R3 = page_num;
+R4 = block_num;
+call MOD_4;
+
+//---------------------------------------DISK FREE LIST STORED-------------------------------------------
+
+
+//-------------------------------STORED THE MEM COPY OF ROOT FILE---------------------------------------
+page_num = 62;
+block_num = 5;
+R1 = DISK_STORE;
+R2 = [SYSTEM_STATUS_TABLE + 1];
+R3 = page_num;
+R4 = block_num;
+call MOD_4;
+
+//------------------------------------ROOT FILE STORED---------------------------------------------------
+	

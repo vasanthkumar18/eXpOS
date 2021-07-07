@@ -1,0 +1,46 @@
+type
+node{
+    int val;
+    node next;
+}
+endtype
+int main()
+{
+    decl
+        int i,ret,n,j;
+        str str1,str2,str3;
+        node head,temp,p,t;
+    enddecl
+    begin
+        ret=initialize();
+        head=null;
+        str1="Enter n";
+        ret=exposcall("Write",-2,str1);
+        ret=exposcall("Read",-1,n);
+        str2="Enter element";
+        ret=exposcall("Write",-2,str2);
+        i=0;
+        while(i<n) do
+            ret=exposcall("Read",-1,j);
+            t=alloc();
+            t.val=j;
+            t.next=null;
+            if(i==0) then
+                head=t;
+                p=t;
+            else
+                p.next=t;
+                p=p.next;
+            endif;
+            i=i+1;
+        endwhile;
+        str3="List is";
+        ret=exposcall("Write",-2,str3);
+        p=head;
+        while(p!=null) do
+            ret=exposcall("Write",-2,p.val);
+            p=p.next;
+        endwhile;
+    return 0;
+    end
+}

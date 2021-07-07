@@ -1,0 +1,99 @@
+//R1 = functionNUm
+//R2 = PID
+
+if(R1 == FREE_USER_AREA_PAGE) then
+	backup;
+
+	R1 = RELEASE_PAGE;
+	R2 = [PROCESS_TABLE + R2*16 + 11];
+
+	call MOD_2;
+	restore;
+	return;
+endif;
+
+if(R1 == EXIT_PROCESS) then
+	backup;
+	alias pid R3;
+	pid = R2;
+
+	R1 = FREE_USER_AREA_PAGE;
+	R2 = pid;
+
+	call MOD_1;
+	
+	R1 = FREE_PAGE_TABLE;
+	R2 = pid;
+
+	call MOD_1;
+
+	restore;
+	[PROCESS_TABLE + R2*16 + 4] = TERMINATED;
+	return;
+endif;
+
+if(R1 == FREE_PAGE_TABLE) then		// free table table
+	backup;
+	alias i R3;
+	alias pid R4;
+	i = 4;
+	pid = R2;
+
+	while(i < 20) do
+		if([PAGE_TABLE_BASE + 20*pid + i] != -1) then
+			R1 = RELEASE_PAGE;
+			R2 = [PAGE_TABLE_BASE + 20*pid + i];
+			
+			call MOD_2;
+			[PAGE_TABLE_BASE + 20*pid + i] = -1;
+			[PAGE_TABLE_BASE + 20*pid + i+1] = "0000";
+		endif;
+	i = i+2;
+	endwhile;
+
+		if([DISK_MAP_TABLE + 10*pid + 2] != -1) then
+			backup;
+			R1 = RELEASE_BLOCK;
+			R2 = [DISK_MAP_TABLE + 10*pid + 2];
+			R3 = pid;
+			call MOD_2;
+			restore;
+		endif;
+
+		if([DISK_MAP_TABLE + 10*pid + 3] != -1) then
+                        backup;
+                        R1 = RELEASE_BLOCK;
+                        R2 = [DISK_MAP_TABLE + 10*pid + 3];
+                        R3 = pid;
+                        call MOD_2;
+                        restore;
+                endif;
+
+		if([DISK_MAP_TABLE + 10*pid + 8] != -1) then
+                        backup;
+                        R1 = RELEASE_BLOCK;
+                        R2 = [DISK_MAP_TABLE + 10*pid + 8];
+                        R3 = pid;
+                        call MOD_2;
+                        restore;
+                endif;
+
+		if([DISK_MAP_TABLE + 10*pid + 9] != -1) then
+                        backup;
+                        R1 = RELEASE_BLOCK;
+                        R2 = [DISK_MAP_TABLE + 10*pid + 9];
+                        R3 = pid;
+                        call MOD_2;
+                        restore;
+                endif;
+
+	i = 0;
+	while(i < 10) do
+		[DISK_MAP_TABLE + 10*pid + i] = -1;
+		i = i+1;
+	endwhile;
+
+	restore;
+	return ;
+endif;
+

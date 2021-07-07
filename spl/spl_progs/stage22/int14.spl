@@ -1,0 +1,140 @@
+//////////////// SEM-LOCK && SEM-UNLOCK SYSTEM CALLS //////////////////////
+//number of kernel mode switch
+[70*512 + 511] = [70*512+511] + 1;
+
+alias userSP			 					R0;
+alias sys_call_no 					R1;
+alias semaphore_descriptor 	R2;
+alias userAreaPageNo 				R3;
+alias semaphore_table_index R4;
+alias i 										R5;
+
+userSP = SP;
+
+//Switching to kernel stack
+[PROCESS_TABLE + ( [SYSTEM_STATUS_TABLE + 1] * 16) + 13] = SP; //Saving sp value in UPTR field
+SP = [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE + 1] * 16) + 11] * 512 - 1; //Setting up kernel stack
+
+//accessing the System call number from user stack(Since system call number is before arg 1 it is at (sp-5))
+sys_call_no=[([PTBR + 2 * ((userSP - 5)/ 512)] * 512) + (userSP - 5) % 512];
+
+if(sys_call_no==19) then  //SEM-LOCK system call
+
+	//Setting mode flag to system call number
+	[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1] * 16 + 9] = 19;
+
+	semaphore_descriptor = [([PTBR + 2 * ((userSP - 4)/ 512)] * 512) + (userSP - 4) % 512];
+
+	userAreaPageNo = [PROCESS_TABLE+16*[SYSTEM_STATUS_TABLE+1]+11];
+
+	if(semaphore_descriptor<0 || semaphore_descriptor>=8 || [userAreaPageNo*512 + (semaphore_descriptor * 2 + 496)]!=1) then
+
+		//Setting return value as -1 (Failure)
+		[([PTBR + 2 * ((userSP - 1) / 512)] * 512) + ((userSP - 1) % 512)] = -1;
+
+		//reset mode flag (0 indicates process is in user mode).
+		[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1] * 16 + 9] = 0;
+
+		//changing back to user stack
+		SP = userSP;
+
+		ireturn;
+
+	endif;
+
+	semaphore_table_index = [userAreaPageNo*512 + (semaphore_descriptor * 2 + 496) +1];
+
+	while([SEMAPHORE_TABLE + 4*semaphore_table_index + 0] != -1 && [SEMAPHORE_TABLE + 4*semaphore_table_index + 0]!=[SYSTEM_STATUS_TABLE+1]) do
+
+		[PROCESS_TABLE+16*[SYSTEM_STATUS_TABLE+1]+4]=WAIT_SEMAPHORE;
+		[PROCESS_TABLE+16*[SYSTEM_STATUS_TABLE+1]+5]=semaphore_table_index;
+
+		backup;
+		call MOD_5;
+		restore;
+
+	endwhile;
+
+	[SEMAPHORE_TABLE + 4*semaphore_table_index + 0] = [SYSTEM_STATUS_TABLE+1];
+
+
+	//Changing back to user stack and return to user mode
+	SP = [PROCESS_TABLE + ( [SYSTEM_STATUS_TABLE + 1] * 16) + 13];
+
+	//restoring mode flag
+	[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1] * 16 + 9] = 0;
+
+	//Setting return value as 0 (Success)
+	[([PTBR + 2 * ((userSP - 1) / 512)] * 512) + ((userSP - 1) % 512)] = 0;
+
+	ireturn;
+endif;
+
+if(sys_call_no==20) then //SEM_UNLOCK system call
+
+	//Setting mode flag to system call number
+	[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1] * 16 + 9] = 20;
+
+	semaphore_descriptor = [([PTBR + 2 * ((userSP - 4)/ 512)] * 512) + (userSP - 4) % 512];
+
+	userAreaPageNo = [PROCESS_TABLE+16*[SYSTEM_STATUS_TABLE+1]+11];
+
+	if(semaphore_descriptor<0 || semaphore_descriptor>=8 || [userAreaPageNo*512 + (semaphore_descriptor * 2 + 496)]!=1) then
+
+		//Setting return value as -1 (Failure)
+		[([PTBR + 2 * ((userSP - 1) / 512)] * 512) + ((userSP - 1) % 512)] = -1;
+
+		//reset mode flag (0 indicates process is in user mode).
+		[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1] * 16 + 9] = 0;
+
+		//changing back to user stack
+		SP = userSP;
+
+		ireturn;
+
+	endif;
+
+	semaphore_table_index = [userAreaPageNo*512 + (semaphore_descriptor * 2 + 496) +1];
+
+	if([SEMAPHORE_TABLE + 4*semaphore_table_index + 0]!=-1) then
+
+		if([SEMAPHORE_TABLE + 4*semaphore_table_index + 0]!=[SYSTEM_STATUS_TABLE+1]) then
+
+			//Setting return value as -2 (Failure)
+			[([PTBR + 2 * ((userSP - 1) / 512)] * 512) + ((userSP - 1) % 512)] = -2;
+
+			//reset mode flag (0 indicates process is in user mode).
+			[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1] * 16 + 9] = 0;
+
+			//changing back to user stack
+			SP = userSP;
+
+			ireturn;
+		endif;
+
+		[SEMAPHORE_TABLE + 4*semaphore_table_index + 0]=-1;
+
+		i=0;
+		while(i<=15) do
+			if([PROCESS_TABLE+16*i+4]==WAIT_SEMAPHORE && [PROCESS_TABLE+16*i+5]==semaphore_table_index) then
+
+				[PROCESS_TABLE+16*i+4]=READY;
+
+			endif;
+			i=i+1;
+
+		endwhile;
+	endif;
+
+	//Changing back to user stack and return to user mode
+	SP = [PROCESS_TABLE + ( [SYSTEM_STATUS_TABLE + 1] * 16) + 13];
+
+	//restoring mode flag
+	[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1] * 16 + 9] = 0;
+
+	//Setting return value as 0 (Success)
+	[([PTBR + 2 * ((userSP - 1) / 512)] * 512) + ((userSP - 1) % 512)] = 0;
+
+	ireturn;
+
+endif;

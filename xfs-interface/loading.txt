@@ -1,0 +1,440 @@
+===================================== STAGE 14  ================================
+
+assignemnt 1
+
+
+load --os $HOME/myexpos/spl/spl_progs/stage14/os_startup14.xsm
+load --module 7 $HOME/myexpos/spl/spl_progs/stage14/boot1.xsm
+load --module 5 $HOME/myexpos/spl/spl_progs/stage14/mod5.xsm
+load --int=timer $HOME/myexpos/spl/spl_progs/stage14/timer14.xsm
+load --int=10 $HOME/myexpos/spl/spl_progs/stage14/int10.xsm
+load --int=7 $HOME/myexpos/spl/spl_progs/stage10/int7.xsm
+
+
+
+============================== STAGE 15 normal ====================================
+
+load --os $HOME/myexpos/spl/spl_progs/stage14/os_startup14.xsm
+load --module 7 $HOME/myexpos/spl/spl_progs/stage15/bootnormal.xsm
+load --module 5 $HOME/myexpos/spl/spl_progs/stage14/mod5.xsm
+load --int=timer $HOME/myexpos/spl/spl_progs/stage14/timer14.xsm
+load --int=10 $HOME/myexpos/spl/spl_progs/stage14/int10.xsm
+load --module 0 $HOME/myexpos/spl/spl_progs/stage15/mod0.xsm
+load --module 4 $HOME/myexpos/spl/spl_progs/stage15/mod4.xsm
+load --int=7 $HOME/myexpos/spl/spl_progs/stage15/int7.xsm
+
+
+assignment 1
+
+load --os $HOME/myexpos/spl/spl_progs/stage14/os_startup14.xsm
+load --module 7 $HOME/myexpos/spl/spl_progs/stage15/bootnormal.xsm
+load --module 5 $HOME/myexpos/spl/spl_progs/stage14/mod5.xsm
+load --int=timer $HOME/myexpos/spl/spl_progs/stage15/timer15.xsm
+load --int=10 $HOME/myexpos/spl/spl_progs/stage14/int10.xsm
+load --module 0 $HOME/myexpos/spl/spl_progs/stage15/mod0_ass.xsm
+load --module 4 $HOME/myexpos/spl/spl_progs/stage15/mod4.xsm
+load --int=7 $HOME/myexpos/spl/spl_progs/stage15/int7.xsm
+
+
+================================ STAGE 16 normal ==============================
+load --os $HOME/myexpos/spl/spl_progs/stage14/os_startup14.xsm
+load --module 7 $HOME/myexpos/spl/spl_progs/stage16/boot.xsm
+load --module 5 $HOME/myexpos/spl/spl_progs/stage14/mod5.xsm
+load --int=timer $HOME/myexpos/spl/spl_progs/stage14/timer14.xsm
+load --int=10 $HOME/myexpos/spl/spl_progs/stage14/int10.xsm
+load --module 0 $HOME/myexpos/spl/spl_progs/stage15/mod0.xsm
+load --module 4 $HOME/myexpos/spl/spl_progs/stage16/mod4.xsm
+load --int=7 $HOME/myexpos/spl/spl_progs/stage15/int7.xsm
+load --int=6 $HOME/myexpos/spl/spl_progs/stage16/int6.xsm
+load --int=console $HOME/myexpos/spl/spl_progs/stage16/console_int_handler.xsm
+load --init $HOME/myexpos/expl/expl_progs/stage16/gcd.xsm
+
+assignment 1
+
+load --os $HOME/myexpos/spl/spl_progs/stage14/os_startup14.xsm
+load --module 7 $HOME/myexpos/spl/spl_progs/stage16/boot.xsm
+load --module 5 $HOME/myexpos/spl/spl_progs/stage14/mod5.xsm
+load --int=timer $HOME/myexpos/spl/spl_progs/stage15/timer15.xsm
+load --int=10 $HOME/myexpos/spl/spl_progs/stage14/int10.xsm
+load --module 0 $HOME/myexpos/spl/spl_progs/stage15/mod0.xsm
+load --module 4 $HOME/myexpos/spl/spl_progs/stage16/mod4.xsm
+load --int=7 $HOME/myexpos/spl/spl_progs/stage15/int7.xsm
+load --int=6 $HOME/myexpos/spl/spl_progs/stage16/int6.xsm
+load --int=console $HOME/myexpos/spl/spl_progs/stage16/console_int_handler.xsm
+load --init $HOME/myexpos/expl/expl_progs/stage16/sorting.xsm
+
+
+assignment 2
+
+load --os $HOME/myexpos/spl/spl_progs/stage14/os_startup14.xsm
+load --module 7 $HOME/myexpos/spl/spl_progs/stage16/boot.xsm
+load --module 5 $HOME/myexpos/spl/spl_progs/stage14/mod5.xsm
+load --int=timer $HOME/myexpos/spl/spl_progs/stage15/timer15.xsm
+load --int=10 $HOME/myexpos/spl/spl_progs/stage14/int10.xsm
+load --module 0 $HOME/myexpos/spl/spl_progs/stage15/mod0.xsm
+load --module 4 $HOME/myexpos/spl/spl_progs/stage16/mod4.xsm
+load --int=7 $HOME/myexpos/spl/spl_progs/stage15/int7.xsm
+load --int=6 $HOME/myexpos/spl/spl_progs/stage16/int6.xsm
+load --int=console $HOME/myexpos/spl/spl_progs/stage16/console_int_handler_ass.xsm
+load --init $HOME/myexpos/expl/expl_progs/stage16/sorting.xsm
+
+(23)Syntax : terminalstatus / tst
+Semantics : Displays the Terminal Status Table.
+
+p 0 for process table
+p 1c
+
+
+==================== STAGE 17 normal ====================================
+
+load --os $HOME/myexpos/spl/spl_progs/stage14/os_startup14.xsm
+load --module 7 $HOME/myexpos/spl/spl_progs/stage17/boot.xsm
+load --module 5 $HOME/myexpos/spl/spl_progs/stage14/mod5.xsm
+load --int=timer $HOME/myexpos/spl/spl_progs/stage15/timer15.xsm
+load --int=10 $HOME/myexpos/spl/spl_progs/stage14/int10.xsm
+load --module 0 $HOME/myexpos/spl/spl_progs/stage15/mod0.xsm
+load --module 4 $HOME/myexpos/spl/spl_progs/stage16/mod4.xsm
+load --int=7 $HOME/myexpos/spl/spl_progs/stage15/int7.xsm
+load --int=6 $HOME/myexpos/spl/spl_progs/stage16/int6.xsm
+load --int=console $HOME/myexpos/spl/spl_progs/stage16/console_int_handler.xsm
+load --init $HOME/myexpos/expl/expl_progs/stage16/sorting.xsm
+load --int=9 $HOME/myexpos/spl/spl_progs/stage17/int9.xsm
+load --module 1 $HOME/myexpos/spl/spl_progs/stage17/mod1.xsm
+load --module 2 $HOME/myexpos/spl/spl_progs/stage17/mod2.xsm
+
+
+
+
+assignment 1
+
+load --os $HOME/myexpos/spl/spl_progs/stage14/os_startup14.xsm
+load --module 7 $HOME/myexpos/spl/spl_progs/stage17/boot.xsm
+load --module 5 $HOME/myexpos/spl/spl_progs/stage14/mod5.xsm
+load --int=timer $HOME/myexpos/spl/spl_progs/stage15/timer15.xsm
+load --int=10 $HOME/myexpos/spl/spl_progs/stage14/int10.xsm
+load --module 0 $HOME/myexpos/spl/spl_progs/stage15/mod0.xsm
+load --module 4 $HOME/myexpos/spl/spl_progs/stage16/mod4.xsm
+load --int=7 $HOME/myexpos/spl/spl_progs/stage15/int7.xsm
+load --int=6 $HOME/myexpos/spl/spl_progs/stage16/int6.xsm
+load --int=console $HOME/myexpos/spl/spl_progs/stage16/console_int_handler.xsm
+load --init $HOME/myexpos/expl/expl_progs/shell.xsm
+load --int=9 $HOME/myexpos/spl/spl_progs/stage17/int9.xsm
+load --module 1 $HOME/myexpos/spl/spl_progs/stage17/mod1.xsm
+load --module 2 $HOME/myexpos/spl/spl_progs/stage17/mod2.xsm
+
+assignment 2
+
+load --os $HOME/myexpos/spl/spl_progs/stage14/os_startup14.xsm
+load --module 7 $HOME/myexpos/spl/spl_progs/stage17/boot.xsm
+load --module 5 $HOME/myexpos/spl/spl_progs/stage14/mod5.xsm
+load --int=timer $HOME/myexpos/spl/spl_progs/stage15/timer15.xsm
+load --int=10 $HOME/myexpos/spl/spl_progs/stage14/int10.xsm
+load --module 0 $HOME/myexpos/spl/spl_progs/stage15/mod0.xsm
+load --module 4 $HOME/myexpos/spl/spl_progs/stage16/mod4.xsm
+load --int=7 $HOME/myexpos/spl/spl_progs/stage15/int7.xsm
+load --int=6 $HOME/myexpos/spl/spl_progs/stage16/int6.xsm
+load --int=console $HOME/myexpos/spl/spl_progs/stage16/console_int_handler.xsm
+load --init $HOME/myexpos/expl/expl_progs/shell.xsm
+load --int=9 $HOME/myexpos/spl/spl_progs/stage17/int9.xsm
+load --module 1 $HOME/myexpos/spl/spl_progs/stage17/mod1.xsm
+load --module 2 $HOME/myexpos/spl/spl_progs/stage17/mod2ass2.xsm
+
+
+sst : system status table
+mf : memory free list
+
+
+
+================================== stage 18 normal =====================
+
+load --os $HOME/myexpos/spl/spl_progs/stage14/os_startup14.xsm
+load --module 7 $HOME/myexpos/spl/spl_progs/stage18/boot.xsm
+load --module 5 $HOME/myexpos/spl/spl_progs/stage14/mod5.xsm
+load --int=timer $HOME/myexpos/spl/spl_progs/stage15/timer15.xsm
+load --int=10 $HOME/myexpos/spl/spl_progs/stage14/int10.xsm
+load --module 0 $HOME/myexpos/spl/spl_progs/stage18/mod0.xsm
+load --module 4 $HOME/myexpos/spl/spl_progs/stage18/mod4.xsm
+load --int=7 $HOME/myexpos/spl/spl_progs/stage15/int7.xsm
+load --int=6 $HOME/myexpos/spl/spl_progs/stage16/int6.xsm
+load --int=console $HOME/myexpos/spl/spl_progs/stage16/console_int_handler.xsm
+load --init $HOME/myexpos/expl/expl_progs/shell.xsm
+load --int=9 $HOME/myexpos/spl/spl_progs/stage18/int9.xsm
+load --module 1 $HOME/myexpos/spl/spl_progs/stage17/mod1.xsm
+load --module 2 $HOME/myexpos/spl/spl_progs/stage17/mod2.xsm
+load --int=disk $HOME/myexpos/spl/spl_progs/stage18/disk_interrupt.xsm
+
+
+assignment 1
+
+load --os $HOME/myexpos/spl/spl_progs/stage14/os_startup14.xsm
+load --module 7 $HOME/myexpos/spl/spl_progs/stage18/boot.xsm
+load --module 5 $HOME/myexpos/spl/spl_progs/stage14/mod5.xsm
+load --int=timer $HOME/myexpos/spl/spl_progs/stage15/timer15.xsm
+load --int=10 $HOME/myexpos/spl/spl_progs/stage14/int10.xsm
+load --module 0 $HOME/myexpos/spl/spl_progs/stage18/mod0.xsm
+load --module 4 $HOME/myexpos/spl/spl_progs/stage18/mod4.xsm
+load --int=7 $HOME/myexpos/spl/spl_progs/stage15/int7.xsm
+load --int=6 $HOME/myexpos/spl/spl_progs/stage16/int6.xsm
+load --int=console $HOME/myexpos/spl/spl_progs/stage16/console_int_handler.xsm
+load --init $HOME/myexpos/expl/expl_progs/shell.xsm
+load --int=9 $HOME/myexpos/spl/spl_progs/stage18/int9.xsm
+load --module 1 $HOME/myexpos/spl/spl_progs/stage17/mod1.xsm
+load --module 2 $HOME/myexpos/spl/spl_progs/stage17/mod2.xsm
+load --int=disk $HOME/myexpos/spl/spl_progs/stage18/disk_interrupt_ass.xsm
+
+
+dst : disk status table
+
+
+============================== stage 19 normal =================================
+
+load --os $HOME/myexpos/spl/spl_progs/stage14/os_startup14.xsm
+load --module 7 $HOME/myexpos/spl/spl_progs/stage19/boot.xsm
+load --module 5 $HOME/myexpos/spl/spl_progs/stage14/mod5.xsm
+load --int=timer $HOME/myexpos/spl/spl_progs/stage15/timer15.xsm
+load --int=10 $HOME/myexpos/spl/spl_progs/stage14/int10.xsm
+load --module 0 $HOME/myexpos/spl/spl_progs/stage18/mod0.xsm
+load --module 4 $HOME/myexpos/spl/spl_progs/stage18/mod4.xsm
+load --int=7 $HOME/myexpos/spl/spl_progs/stage15/int7.xsm
+load --int=6 $HOME/myexpos/spl/spl_progs/stage16/int6.xsm
+load --int=console $HOME/myexpos/spl/spl_progs/stage16/console_int_handler.xsm
+load --init $HOME/myexpos/expl/expl_progs/shell.xsm
+load --int=9 $HOME/myexpos/spl/spl_progs/stage19/int9.xsm
+load --module 1 $HOME/myexpos/spl/spl_progs/stage19/mod1.xsm
+load --module 2 $HOME/myexpos/spl/spl_progs/stage19/mod2.xsm
+load --int=disk $HOME/myexpos/spl/spl_progs/stage18/disk_interrupt.xsm
+load --exhandler $HOME/myexpos/spl/spl_progs/stage19/exec_handler.xsm
+
+
+assignment 1
+load stage19/llist.xsm in inode table(done already)
+
+
+same loading of normal..!!
+
+
+assigment 2
+
+// int 9 here doesn't have breakpoints
+// mod2ass.xsm has breakpoints
+
+
+
+load --os $HOME/myexpos/spl/spl_progs/stage14/os_startup14.xsm
+load --module 7 $HOME/myexpos/spl/spl_progs/stage19/boot.xsm
+load --module 5 $HOME/myexpos/spl/spl_progs/stage14/mod5.xsm
+load --int=timer $HOME/myexpos/spl/spl_progs/stage15/timer15.xsm
+load --int=10 $HOME/myexpos/spl/spl_progs/stage14/int10.xsm
+load --module 0 $HOME/myexpos/spl/spl_progs/stage18/mod0.xsm
+load --module 4 $HOME/myexpos/spl/spl_progs/stage18/mod4.xsm
+load --int=7 $HOME/myexpos/spl/spl_progs/stage15/int7.xsm
+load --int=6 $HOME/myexpos/spl/spl_progs/stage16/int6.xsm
+load --int=console $HOME/myexpos/spl/spl_progs/stage16/console_int_handler.xsm
+load --init $HOME/myexpos/expl/expl_progs/shell.xsm
+load --int=9 $HOME/myexpos/spl/spl_progs/stage19/int9ass.xsm 
+load --module 1 $HOME/myexpos/spl/spl_progs/stage19/mod1.xsm
+load --module 2 $HOME/myexpos/spl/spl_progs/stage19/mod2ass.xsm
+load --int=disk $HOME/myexpos/spl/spl_progs/stage18/disk_interrupt.xsm
+load --exhandler $HOME/myexpos/spl/spl_progs/stage19/exec_handler.xsm
+
+disk map table: dmt
+page table : pt
+
+================================== stage 20 normal ====================================
+
+load --os $HOME/myexpos/spl/spl_progs/stage14/os_startup14.xsm
+load --module 7 $HOME/myexpos/spl/spl_progs/stage20/boot.xsm
+load --module 5 $HOME/myexpos/spl/spl_progs/stage20/mod5.xsm
+load --int=timer $HOME/myexpos/spl/spl_progs/stage15/timer15.xsm
+load --int=10 $HOME/myexpos/spl/spl_progs/stage20/int10.xsm
+load --module 0 $HOME/myexpos/spl/spl_progs/stage18/mod0.xsm
+load --module 4 $HOME/myexpos/spl/spl_progs/stage18/mod4.xsm
+load --int=7 $HOME/myexpos/spl/spl_progs/stage15/int7.xsm
+load --int=6 $HOME/myexpos/spl/spl_progs/stage16/int6.xsm
+load --int=console $HOME/myexpos/spl/spl_progs/stage16/console_int_handler.xsm
+load --init $HOME/myexpos/expl/expl_progs/shell.xsm
+load --int=9 $HOME/myexpos/spl/spl_progs/stage19/int9.xsm
+load --module 1 $HOME/myexpos/spl/spl_progs/stage20/mod1.xsm
+load --module 2 $HOME/myexpos/spl/spl_progs/stage19/mod2.xsm
+load --int=disk $HOME/myexpos/spl/spl_progs/stage18/disk_interrupt.xsm
+load --exhandler $HOME/myexpos/spl/spl_progs/stage19/exec_handler.xsm
+load --int=8 $HOME/myexpos/spl/spl_progs/stage20/int8.xsm
+
+assignment 1
+
+load --os $HOME/myexpos/spl/spl_progs/stage14/os_startup14.xsm
+load --module 7 $HOME/myexpos/spl/spl_progs/stage20/boot.xsm
+load --module 5 $HOME/myexpos/spl/spl_progs/stage20/mod5.xsm
+load --int=timer $HOME/myexpos/spl/spl_progs/stage15/timer15.xsm
+load --int=10 $HOME/myexpos/spl/spl_progs/stage20/int10.xsm
+load --module 0 $HOME/myexpos/spl/spl_progs/stage18/mod0.xsm
+load --module 4 $HOME/myexpos/spl/spl_progs/stage18/mod4.xsm
+load --int=7 $HOME/myexpos/spl/spl_progs/stage15/int7.xsm
+load --int=6 $HOME/myexpos/spl/spl_progs/stage16/int6.xsm
+load --int=console $HOME/myexpos/spl/spl_progs/stage16/console_int_handler.xsm
+load --init $HOME/myexpos/expl/expl_progs/stage20/forking.xsm
+load --int=9 $HOME/myexpos/spl/spl_progs/stage19/int9.xsm
+load --module 1 $HOME/myexpos/spl/spl_progs/stage20/mod1.xsm
+load --module 2 $HOME/myexpos/spl/spl_progs/stage19/mod2.xsm
+load --int=disk $HOME/myexpos/spl/spl_progs/stage18/disk_interrupt.xsm
+load --exhandler $HOME/myexpos/spl/spl_progs/stage19/exec_handler.xsm
+load --int=8 $HOME/myexpos/spl/spl_progs/stage20/int8.xsm
+
+run odd.xsm and even.xsm
+
+
+assignment 2
+
+load --os $HOME/myexpos/spl/spl_progs/stage14/os_startup14.xsm
+load --module 7 $HOME/myexpos/spl/spl_progs/stage20/boot.xsm
+load --module 5 $HOME/myexpos/spl/spl_progs/stage20/mod5.xsm
+load --int=timer $HOME/myexpos/spl/spl_progs/stage15/timer15.xsm
+load --int=10 $HOME/myexpos/spl/spl_progs/stage20/int10.xsm
+load --module 0 $HOME/myexpos/spl/spl_progs/stage18/mod0.xsm
+load --module 4 $HOME/myexpos/spl/spl_progs/stage18/mod4.xsm
+load --int=7 $HOME/myexpos/spl/spl_progs/stage15/int7.xsm
+load --int=6 $HOME/myexpos/spl/spl_progs/stage16/int6.xsm
+load --int=console $HOME/myexpos/spl/spl_progs/stage16/console_int_handler.xsm
+load --init $HOME/myexpos/expl/expl_progs/stage20/fork100.xsm
+load --int=9 $HOME/myexpos/spl/spl_progs/stage19/int9.xsm
+load --module 1 $HOME/myexpos/spl/spl_progs/stage20/mod1.xsm
+load --module 2 $HOME/myexpos/spl/spl_progs/stage19/mod2.xsm
+load --int=disk $HOME/myexpos/spl/spl_progs/stage18/disk_interrupt.xsm
+load --exhandler $HOME/myexpos/spl/spl_progs/stage19/exec_handler.xsm
+load --int=8 $HOME/myexpos/spl/spl_progs/stage20/int8.xsm
+
+
+
+=================================== STAGE 21 =================================
+
+assignment 1
+
+load --os $HOME/myexpos/spl/spl_progs/stage14/os_startup14.xsm
+load --module 7 $HOME/myexpos/spl/spl_progs/stage21/boot.xsm
+load --module 5 $HOME/myexpos/spl/spl_progs/stage20/mod5.xsm
+load --int=timer $HOME/myexpos/spl/spl_progs/stage15/timer15.xsm
+load --int=10 $HOME/myexpos/spl/spl_progs/stage20/int10.xsm
+load --module 0 $HOME/myexpos/spl/spl_progs/stage18/mod0.xsm
+load --module 4 $HOME/myexpos/spl/spl_progs/stage18/mod4.xsm
+load --int=7 $HOME/myexpos/spl/spl_progs/stage15/int7.xsm
+load --int=6 $HOME/myexpos/spl/spl_progs/stage16/int6.xsm
+load --int=console $HOME/myexpos/spl/spl_progs/stage16/console_int_handler.xsm
+load --init $HOME/myexpos/expl/expl_progs/stage21/shell.xsm
+load --int=9 $HOME/myexpos/spl/spl_progs/stage19/int9.xsm
+load --module 1 $HOME/myexpos/spl/spl_progs/stage21/mod1.xsm
+load --module 2 $HOME/myexpos/spl/spl_progs/stage19/mod2.xsm
+load --int=disk $HOME/myexpos/spl/spl_progs/stage18/disk_interrupt.xsm
+load --exhandler $HOME/myexpos/spl/spl_progs/stage19/exec_handler.xsm
+load --int=8 $HOME/myexpos/spl/spl_progs/stage20/int8.xsm
+load --int=11 $HOME/myexpos/spl/spl_progs/stage21/int11.xsm
+load --int=15 $HOME/myexpos/spl/spl_progs/stage21/int15.xsm
+
+just run any user program
+
+assignment 2
+
+use assign 1 commands
+run pid2.xsm and getpid.xsm
+
+
+=============================== STAGE 22 =================================
+
+load --os $HOME/myexpos/spl/spl_progs/stage14/os_startup14.xsm
+load --module 7 $HOME/myexpos/spl/spl_progs/stage22/boot.xsm
+load --module 5 $HOME/myexpos/spl/spl_progs/stage20/mod5.xsm
+load --int=timer $HOME/myexpos/spl/spl_progs/stage15/timer15.xsm
+load --int=10 $HOME/myexpos/spl/spl_progs/stage20/int10.xsm
+load --module 0 $HOME/myexpos/spl/spl_progs/stage22/mod0.xsm
+load --module 4 $HOME/myexpos/spl/spl_progs/stage18/mod4.xsm
+load --int=7 $HOME/myexpos/spl/spl_progs/stage15/int7.xsm
+load --int=6 $HOME/myexpos/spl/spl_progs/stage16/int6.xsm
+load --int=console $HOME/myexpos/spl/spl_progs/stage16/console_int_handler.xsm
+load --init $HOME/myexpos/expl/expl_progs/stage21/shell.xsm
+load --int=9 $HOME/myexpos/spl/spl_progs/stage19/int9.xsm
+load --module 1 $HOME/myexpos/spl/spl_progs/stage22/mod1.xsm
+load --module 2 $HOME/myexpos/spl/spl_progs/stage19/mod2.xsm
+load --int=disk $HOME/myexpos/spl/spl_progs/stage18/disk_interrupt.xsm
+load --exhandler $HOME/myexpos/spl/spl_progs/stage19/exec_handler.xsm
+load --int=8 $HOME/myexpos/spl/spl_progs/stage22/int8.xsm
+load --int=11 $HOME/myexpos/spl/spl_progs/stage21/int11.xsm
+load --int=15 $HOME/myexpos/spl/spl_progs/stage21/int15.xsm
+load --int=13 $HOME/myexpos/spl/spl_progs/stage22/int13.xsm
+load --int=14 $HOME/myexpos/spl/spl_progs/stage22/int14.xsm
+
+just run normal xsm files from inodeusertable
+
+assignment 1
+
+run one.xsm
+
+assignment 2
+
+run parent.xsm
+		( PID*100 to PID*100 +9) for all PIDs
+assignment 3
+
+run three.xsm
+		sorting numbers to 1 to 64
+
+
+============================= STAGE 23 =============================
+
+
+load --os $HOME/myexpos/spl/spl_progs/stage14/os_startup14.xsm
+load --module 7 $HOME/myexpos/spl/spl_progs/stage23/boot.xsm
+load --module 5 $HOME/myexpos/spl/spl_progs/stage20/mod5.xsm
+load --int=timer $HOME/myexpos/spl/spl_progs/stage15/timer15.xsm
+load --int=10 $HOME/myexpos/spl/spl_progs/stage20/int10.xsm
+load --module 0 $HOME/myexpos/spl/spl_progs/stage23/mod0.xsm
+load --module 4 $HOME/myexpos/spl/spl_progs/stage23/mod4.xsm
+load --int=7 $HOME/myexpos/spl/spl_progs/stage15/int7.xsm
+load --int=6 $HOME/myexpos/spl/spl_progs/stage16/int6.xsm
+load --int=console $HOME/myexpos/spl/spl_progs/stage16/console_int_handler.xsm
+load --init $HOME/myexpos/expl/expl_progs/stage21/shell.xsm
+load --int=9 $HOME/myexpos/spl/spl_progs/stage19/int9.xsm
+load --module 1 $HOME/myexpos/spl/spl_progs/stage22/mod1.xsm
+load --module 2 $HOME/myexpos/spl/spl_progs/stage19/mod2.xsm
+load --int=disk $HOME/myexpos/spl/spl_progs/stage18/disk_interrupt.xsm
+load --exhandler $HOME/myexpos/spl/spl_progs/stage19/exec_handler.xsm
+load --int=8 $HOME/myexpos/spl/spl_progs/stage22/int8.xsm
+load --int=11 $HOME/myexpos/spl/spl_progs/stage21/int11.xsm
+load --int=15 $HOME/myexpos/spl/spl_progs/stage21/int15.xsm
+load --int=13 $HOME/myexpos/spl/spl_progs/stage22/int13.xsm
+load --int=14 $HOME/myexpos/spl/spl_progs/stage22/int14.xsm
+load --int=4 $HOME/myexpos/spl/spl_progs/stage23/int4.xsm
+load --int=15 $HOME/myexpos/spl/spl_progs/stage23/int15.xsm
+
+assignment 1
+
+run create.xsm
+
+
+
+assignment 2
+
+run delete.xsm 
+check inode table, root file to make sure they are deleted
+
+TO CHECK:
+copy 3 4 $HOME/myexpos/inode_table.txt
+copy 5 5 $HOME/myexpos/root_file.txt
+
+NOTE: also check for diff other files, like sample.dat or not created files
+
+
+====================== END ========================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

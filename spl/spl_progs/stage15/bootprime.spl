@@ -1,0 +1,162 @@
+loadi(4,17);
+loadi(5,18);      //timer
+loadi(65,7);
+loadi(66,8);      //init
+loadi(63,13);
+loadi(64,14);     //lib
+loadi(22,35);
+loadi(23,36);     //int10
+loadi(2,15);
+loadi(3,16);      //exc
+loadi(16,29);
+loadi(17,30);     //int7
+loadi(69,11);
+loadi(70,12);     //idle
+loadi(85,69);     //exec of even
+
+loadi(90,70); /// prime : exec 
+
+loadi(50,63);
+loadi(51,64);	// ISR (MODULE 5)
+
+
+loadi(40,53);
+loadi(41,54);
+loadi(48,61);
+loadi(49,62);
+
+PTBR=PAGE_TABLE_BASE+20;
+PTLR=10;
+//Library
+[PTBR+0] = 63;
+[PTBR+1] = "0100";
+[PTBR+2] = 64;
+[PTBR+3] = "0100";
+
+//Heap
+[PTBR+4] = 78;
+[PTBR+5] = "0110";
+[PTBR+6] = 79;
+[PTBR+7] = "0110";
+
+//Code
+[PTBR+8] = 65;
+[PTBR+9] = "0100";
+[PTBR+10] = 66;
+[PTBR+11] = "0100";
+[PTBR+12] = -1;
+[PTBR+13] = "0000";
+[PTBR+14] = -1;
+[PTBR+15] = "0000";
+
+//Stack
+[PTBR+16] = 76;
+[PTBR+17] = "0110";
+[PTBR+18] = 77;
+[PTBR+19] = "0110";
+
+[PROCESS_TABLE+17]=1;
+[PROCESS_TABLE+29]=8*512;
+[PROCESS_TABLE+28]=0;
+[PROCESS_TABLE+30]=PAGE_TABLE_BASE+20;
+[PROCESS_TABLE+31]=10;
+[PROCESS_TABLE+27]=80;
+[PROCESS_TABLE+20]=CREATED;
+[76*512]=[65*512+1];
+
+PTBR=PAGE_TABLE_BASE+40;                   //exec
+PTLR=10;
+//Library
+[PTBR+0] = 63;
+[PTBR+1] = "0100";
+[PTBR+2] = 64;
+[PTBR+3] = "0100";
+
+//Heap
+[PTBR+4] = 88;
+[PTBR+5] = "0110";
+[PTBR+6] = 89;
+[PTBR+7] = "0110";
+
+//Code
+[PTBR+8] = 85;
+[PTBR+9] = "0100";
+[PTBR+10] = -1;
+[PTBR+11] = "0100";
+[PTBR+12] = -1;
+[PTBR+13] = "0000";
+[PTBR+14] = -1;
+[PTBR+15] = "0000";
+
+//Stack
+[PTBR+16] = 86;
+[PTBR+17] = "0110";
+[PTBR+18] = 87;
+[PTBR+19] = "0110";
+
+[PROCESS_TABLE+33]=2;
+[PROCESS_TABLE+45]=8*512;
+[PROCESS_TABLE+44]=0;
+[PROCESS_TABLE+46]=PAGE_TABLE_BASE+40;
+[PROCESS_TABLE+47]=10;
+[PROCESS_TABLE+43]=90;
+[PROCESS_TABLE+36]=CREATED;
+[86*512]=[85*512+1];
+
+
+// for prime
+PTBR=PAGE_TABLE_BASE+60;                  
+PTLR=10;
+//Library
+[PTBR+0] = 63;
+[PTBR+1] = "0100";
+[PTBR+2] = 64;
+[PTBR+3] = "0100";
+
+//Heap
+[PTBR+4] = 93;
+[PTBR+5] = "0110";
+[PTBR+6] = 94;
+[PTBR+7] = "0110";
+
+//Code
+[PTBR+8] = 90;
+[PTBR+9] = "0100";
+[PTBR+10] = -1;
+[PTBR+11] = "0100";
+[PTBR+12] = -1;
+[PTBR+13] = "0000";
+[PTBR+14] = -1;
+[PTBR+15] = "0000";
+
+//Stack
+[PTBR+16] = 91;
+[PTBR+17] = "0110";
+[PTBR+18] = 92;
+[PTBR+19] = "0110";
+
+[PROCESS_TABLE+33+16]=3;
+[PROCESS_TABLE+45+16]=8*512;
+[PROCESS_TABLE+44+16]=0;
+[PROCESS_TABLE+46+16]=PAGE_TABLE_BASE+60;
+[PROCESS_TABLE+47+16]=10;
+[PROCESS_TABLE+43+16]=100;
+[PROCESS_TABLE+36+16]=CREATED;
+[91*512]=[90*512+1];
+
+
+
+[PROCESS_TABLE +16*4+4]=TERMINATED;
+[PROCESS_TABLE +16*5+4]=TERMINATED;
+[PROCESS_TABLE +16*6+4]=TERMINATED;
+[PROCESS_TABLE +16*7+4]=TERMINATED;
+[PROCESS_TABLE +16*8+4]=TERMINATED;
+[PROCESS_TABLE +16*9+4]=TERMINATED;
+[PROCESS_TABLE +16*10+4]=TERMINATED;
+[PROCESS_TABLE +16*11+4]=TERMINATED;
+[PROCESS_TABLE +16*12+4]=TERMINATED;
+[PROCESS_TABLE +16*13+4]=TERMINATED;
+[PROCESS_TABLE +16*14+4]=TERMINATED;
+[PROCESS_TABLE +16*15+4]=TERMINATED;
+
+return;

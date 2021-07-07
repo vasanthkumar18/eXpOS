@@ -1,0 +1,32 @@
+breakpoint;
+[PROCESS_TABLE+([SYSTEM_STATUS_TABLE+1]*16)+13]=SP;
+SP=[PROCESS_TABLE+([SYSTEM_STATUS_TABLE+1]*16)+11]*512-1;
+backup;
+alias currPID R0;
+currPID=[SYSTEM_STATUS_TABLE+1];
+alias pte R1;
+pte=PROCESS_TABLE+currPID*16;
+[pte+12]=SP%512;
+[pte+14]=PTBR;
+[pte+15]=PTLR;
+[pte+4]=READY;
+alias newPID R2;
+newPID=(currPID+1)%3;
+alias newpt R3;
+newpt=PROCESS_TABLE+newPID*16;
+SP=[newpt+11]*512+[newpt+12];
+PTBR=[newpt+14];
+PTLR=[newpt+15];
+
+[SYSTEM_STATUS_TABLE+1]=newPID;
+if([newpt+4]==CREATED) then
+	[newpt+4]=RUNNING;
+	SP=[newpt+13];
+	breakpoint;
+	ireturn;
+endif;
+[newpt+4]=RUNNING;
+restore;
+SP=[PROCESS_TABLE+([SYSTEM_STATUS_TABLE+1]*16)+13];
+breakpoint;
+ireturn;

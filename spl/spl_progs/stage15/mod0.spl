@@ -1,0 +1,45 @@
+alias functionNum R1;
+alias curr_pid R2;
+
+//for the Acquire Terminal
+
+if(functionNum == ACQUIRE_TERMINAL) then
+	while([TERMINAL_STATUS_TABLE] == 1) do	//CHECK IF TERMINAL IS ALREADY IN USE
+		[PROCESS_TABLE + curr_pid*16 + 4] = WAIT_TERMINAL;
+		backup;
+
+		call MOD_5;	// SCHEDULER
+
+		restore;
+	endwhile;
+
+	[TERMINAL_STATUS_TABLE+0] = 1;	//GIVE THE TERMINAL TO THIS PROCESS
+	[TERMINAL_STATUS_TABLE + 1] = curr_pid;
+	
+	return ;	
+
+endif;
+
+//for the release terminal
+
+if(functionNum == RELEASE_TERMINAL) then
+	if(curr_pid != [TERMINAL_STATUS_TABLE + 1]) then
+		R0 = -1;	//return value is -1
+		return;
+	endif;
+
+	[TERMINAL_STATUS_TABLE+0] = 0;
+
+	alias i R7;
+	i = 0;
+	while(i < 16) do
+		if([PROCESS_TABLE + i*16 + 4] == WAIT_TERMINAL) then
+			[PROCESS_TABLE + i*16 + 4] = READY;
+		endif;
+		i = i+1;
+	endwhile;
+
+	R0 = 0;		//successful
+	return;
+
+endif;

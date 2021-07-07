@@ -1,0 +1,227 @@
+// SYSTEM CALL NUMBER FOR CREATE : 1
+// SYSTEM CALL NUMBER FOR DELETE : 4
+
+[PROCESS_TABLE+[SYSTEM_STATUS_TABLE+1]*16+13] = SP;
+alias userSP R1;
+userSP = SP;
+
+SP = [PROCESS_TABLE+[SYSTEM_STATUS_TABLE+1]*16+11]*512-1;
+
+alias syscall R2;
+syscall = [[PTBR+2*((userSP-5))/512]*512 + (userSP-5)%512];
+
+alias process_table R11;
+process_table = PROCESS_TABLE+[SYSTEM_STATUS_TABLE+1]*16;
+
+alias ret_adr R12;
+ret_adr = [PTBR + 2*((userSP-1)/512)]*512 + (userSP-1)%512;
+//------------------------------------------------CREATE---------------------------------------------------
+
+// ARGUMENTS ARE FILENAME, PERMISSION(0/1)
+// RETURN 0 IF SUCCESS OR FILENAME ALREADY PRESENT
+// RETURN -1 IF NO FREE INODE ENTRY FOUND
+
+if(syscall == 1) then
+	[process_table+9] = 1;
+	alias filename R3;
+	alias permission R4;
+
+	filename = [[PTBR+2*((userSP-4)/512)]*512 + (userSP-4)%512];
+	permission = [[PTBR+2*((userSP-3))/512]*512 + (userSP-3)%512];
+
+	alias i R5;
+	i = 0;
+
+	while(i < MAX_FILE_NUM) do
+		if([INODE_TABLE+i*16+1] == filename) then
+			[process_table+9] = 0;
+			[ret_adr] = 0; 
+			SP = [process_table+13];
+
+			ireturn;
+		endif;
+	i = i+1;
+	endwhile;
+	
+	alias free_entry R6;
+	free_entry = -1;
+
+	i = 0;
+	while(i < MAX_FILE_NUM) do
+			if([INODE_TABLE+i*16+1] == -1) then
+				free_entry = i;
+				break;
+			endif;
+	i = i+1;
+	endwhile;
+
+	if(free_entry == -1) then
+		[process_table+9] = 0;
+		[ret_adr] = -1;
+		SP = [process_table+13];
+
+		ireturn;
+	endif;
+
+	alias userID R7;
+	userID = [process_table+3];
+	
+	i = 8;
+	while(i < 12) do
+		[INODE_TABLE + free_entry*16 + i] = -1;
+		i = i+1;
+	endwhile;
+	// ENTRY IN INODE TABLE
+
+	alias base R8;
+	base = INODE_TABLE + free_entry*16;
+	[base + 1] = filename;
+	[base + 2] = 0;
+	[base + 0] = DATA;
+	[base + 3] = [process_table + 3];
+	[base + 4] = permission;	
+
+	// ENTRY IN ROOT FILE
+
+	alias root_base R9;
+	root_base = ROOT_FILE + free_entry*8;
+	[root_base + 0] = filename;
+	[root_base + 1] = 0;
+	[root_base + 2] = DATA;
+	
+	[root_base + 3] = [USER_TABLE + userID*2 + 0];
+	[root_base + 4] = permission;
+
+	[process_table + 9] = 0;
+	[ret_adr] = 0;
+	SP = [process_table + 13];
+
+	ireturn;
+endif;
+
+//---------------------------------------------DELETE-----------------------------------------------------
+
+if(syscall == 4) then
+	// SUCCESS/FILE DOES NOT EXIST : 0
+	// PERMISSION DENIED : -1
+	// FILE IS OPEN : -2
+
+	[process_table + 9] = 4;
+	
+	alias filename R3;
+	filename = [[PTBR+2*((userSP-4))/512]*512 + (userSP-4)%512];
+
+	alias index R4;
+	alias i R5;
+	index = -1;
+	i = 0;
+
+	while(i < MAX_FILE_NUM) do
+			if([INODE_TABLE+16*i+1] == filename) then
+				index = i;
+				break;
+			endif;
+	i = i+1;
+	endwhile;
+
+	// file not found
+	if(index == -1) then
+		[ret_adr] = 0;
+		SP = [process_table+13];
+		[process_table+9] = 0;
+
+		ireturn;
+	endif;
+
+	// file is not a data file
+	alias base R6;
+	base = INODE_TABLE+index*16;
+	if([base+0] != DATA) then
+		 [ret_adr] = -1;
+                SP = [process_table+13];
+                [process_table+9] = 0;
+
+		ireturn;
+	endif;
+
+	// exclusive permission is not set
+	if([base+4] == 0) then
+		// if the current user is not root and the current user does not own the file return -1.
+		if(([base+3] != [process_table+3]) && ([process_table+3] != 1)) then			     
+			[ret_adr] = -1;
+	        	SP = [process_table+13];
+        	        [process_table+9] = 0;
+
+	                ireturn;
+
+		endif;
+	endif;
+
+	multipush(R1, R2, R3);
+	R1 = ACQUIRE_INODE;
+	R2 = [SYSTEM_STATUS_TABLE+1];
+	R3 = index;
+	call MOD_0;
+	multipop(R1, R2, R3);
+
+	// file open count != -1 => file is open, can't delete
+
+	if([FILE_STATUS_TABLE+4*index+1] != -1) then
+		multipush(R1, R2, R3);
+		R1 = RELEASE_INODE;
+		R2 = [SYSTEM_STATUS_TABLE+1];
+		R3 = index;
+		call MOD_0;
+		multipop(R1, R2, R3);
+
+		[process_table+9] = 0;
+		[ret_adr] = -2; // file is in use
+		SP = [process_table+13];
+	
+		ireturn;
+	endif;
+
+	alias block_num R8;
+	i = 8;
+	while(i < 12) do
+		block_num = [base+i];
+		if(block_num != -1) then
+			if([BUFFER_TABLE + (block_num%4)*4 + 0] == block_num && [BUFFER_TABLE + (block_num%4)*4 + 1] == 1) then
+				[BUFFER_TABLE + (block_num%4)*4 + 1] = 0;
+			endif;
+			
+			backup;
+			R1 = RELEASE_BLOCK;
+			R2 =  block_num;
+			R3 = [SYSTEM_STATUS_TABLE+1];
+			call MOD_2;
+			restore;
+		endif;
+	i = i+1;
+	endwhile;
+
+	i = 0;
+	while(i < 16) do
+		[base+i] = -1;
+		i = i+1;
+	endwhile;
+
+	i = 0;
+	while(i < 8) do
+		[ROOT_FILE + index * 8 + i] = -1; 
+		i = i + 1;
+	endwhile;
+
+	backup;
+	R1 = RELEASE_INODE;
+	R2 = [SYSTEM_STATUS_TABLE+1];
+	R3 = index;
+	call MOD_2;
+	restore;
+
+	[process_table+9] = 0;
+	[ret_adr] = 0;
+	SP = [process_table+13];
+
+	ireturn;
+endif;

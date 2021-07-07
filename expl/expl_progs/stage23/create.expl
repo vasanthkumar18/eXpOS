@@ -1,0 +1,14 @@
+int main()
+{
+decl
+	int per,temp;
+	str file;
+enddecl
+
+begin
+	read(file);
+	read(per);
+	temp = exposcall("Create",file,per);
+	return 0;
+end
+}

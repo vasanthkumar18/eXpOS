@@ -1,0 +1,105 @@
+alias functionNum R1;
+alias currentPID R2;
+alias word R3;
+
+//---------------------------------------------TERMINAL WRITE-------------------------------------------
+
+if(functionNum == 3) then
+	backup;			// PUSH THE USED REGISTERS(R1, R2, R3)
+
+	R1 = 8;			// CALL ACQUIRE TERMINAL
+	R2 = currentPID;	
+
+	call MOD_0;		// CALL RESOURCE MANAGER MODULE
+	
+	restore;
+
+	print word;		// TERMINAL HAS BEEN ACQUIRED
+
+	backup;
+
+	R1 = 9;			// CALL RELEASE TERMINAL
+	R2 = currentPID;
+
+	call MOD_0;
+
+	restore;	
+	
+	return;
+endif;
+
+//--------------------------------------------TERMINAL READ---------------------------------------------
+
+if(functionNum == 4) then
+
+	// CALLING THE ACQUIRE TERMINAL FUNCTION
+
+	backup;					// PUSH THE USED REGISTERS(R1, R2, R3);
+
+	R1 = 8;					// CALL ACQUIRE TERMINAL
+	R2 = currentPID;
+	
+	call MOD_0;				// RESOURCE MANAGER MODULE
+
+	restore;
+	
+	read;
+
+	[PROCESS_TABLE + 16*currentPID + 4] = WAIT_TERMINAL;	// CHANGE THE STATE OF CURRENT PROCESS
+	
+	//INVOKING CONTEXT SWITCH MODULE
+	
+	backup;
+
+	call MOD_5;
+
+	restore;
+
+	[[PTBR + 2*(word/512)]*512 + word%512] = [PROCESS_TABLE + currentPID*16 + 8]; // STORETHE INPUT BUFFER IN DESIGNATED ADDDRESS
+	
+endif;
+
+//--------------------------------------------END OF TERMINAL READ---------------------------------------
+
+
+
+
+//---------------------------------------------DISK LOAD-------------------------------------------------
+
+if(functionNum == 2) then
+	
+	// CALLING THE DISK LOAD FUNCTION
+
+	alias page_num R3;
+	alias block_num R4;
+
+	backup;
+
+	R1 = ACQUIRE_DISK;
+	R2 = currentPID;
+
+	call MOD_0;
+
+	restore;
+	
+	// Here we have acquired the disk, so fill the entries of disk status table
+	[DISK_STATUS_TABLE+0] = 1;
+	[DISK_STATUS_TABLE+1] = 0;
+	[DISK_STATUS_TABLE+2] = page_num;
+        [DISK_STATUS_TABLE+3] = block_num;
+	[DISK_STATUS_TABLE+4] = currentPID;
+
+	load(page_num, block_num);
+
+	[PROCESS_TABLE + currentPID*16 + 4] = WAIT_DISK;
+
+	backup;
+
+	call MOD_5;
+
+	restore;
+endif;
+
+//--------------------------------------END OF DISK LOAD-------------------------------------------------
+
+return;
